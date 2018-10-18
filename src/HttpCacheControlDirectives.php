@@ -97,6 +97,4 @@ class HttpCacheControlDirectives
 
         return $directives;
     }
-
-
 }

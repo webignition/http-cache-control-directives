@@ -7,10 +7,46 @@ use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
 
 class HttpCacheControlDirectivesTest extends TestCase
 {
-    public function testCreate()
+    /**
+     * @dataProvider createDataProvider
+     *
+     * @param string $directives
+     * @param array $expectedDirectives
+     */
+    public function testCreate(string $directives, array $expectedDirectives)
     {
-        $cacheControlDirectives = new HttpCacheControlDirectives();
+        $cacheControlDirectives = new HttpCacheControlDirectives($directives);
 
-        $this->assertEquals([], $cacheControlDirectives->getDirectives());
+        $this->assertEquals($expectedDirectives, $cacheControlDirectives->getDirectives());
+    }
+
+    public function createDataProvider(): array
+    {
+        return [
+            'empty' => [
+                'directives' => '',
+                'expectedDirectives' => [],
+            ],
+            'whitespace' => [
+                'directives' => '   ',
+                'expectedDirectives' => [],
+            ],
+            'non-empty' => [
+                'directives' => 'foo=bar fizz buzz',
+                'expectedDirectives' => [
+                    'buzz' => null,
+                    'fizz' => null,
+                    'foo' => 'bar',
+                ],
+            ],
+            'non-empty, multiple whitespace between tokens' => [
+                'directives' => 'foo=bar     fizz     buzz',
+                'expectedDirectives' => [
+                    'buzz' => null,
+                    'fizz' => null,
+                    'foo' => 'bar',
+                ],
+            ],
+        ];
     }
 }

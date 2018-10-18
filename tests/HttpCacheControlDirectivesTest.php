@@ -17,7 +17,7 @@ class HttpCacheControlDirectivesTest extends TestCase
     {
         $cacheControlDirectives = new HttpCacheControlDirectives($directives);
 
-        $this->assertEquals($expectedDirectives, $cacheControlDirectives->getDirectives());
+        $this->assertSame($expectedDirectives, $cacheControlDirectives->getDirectives());
     }
 
     public function createDataProvider(): array
@@ -45,6 +45,30 @@ class HttpCacheControlDirectivesTest extends TestCase
                     'buzz' => null,
                     'fizz' => null,
                     'foo' => 'bar',
+                ],
+            ],
+            'integer types are cast to integer' => [
+                'directives' => 'max-age=1, max-stale=2, min-fresh=3, s-maxage=4',
+                'expectedDirectives' => [
+                    'max-age' => 1,
+                    'max-stale' => 2,
+                    'min-fresh' => 3,
+                    's-maxage' => 4,
+                ],
+            ],
+            'types with no value have value removed' => [
+                'directives' =>
+                    'no-cache=a, no-store=a, no-transform=a, only-if-cached=a, must-revalidate=a, public=a, '
+                    .'private=a, proxy-revalidate=a',
+                'expectedDirectives' => [
+                    'no-cache' => null,
+                    'no-store' => null,
+                    'no-transform' => null,
+                    'only-if-cached' => null,
+                    'must-revalidate' => null,
+                    'public' => null,
+                    'private' => null,
+                    'proxy-revalidate' => null,
                 ],
             ],
         ];

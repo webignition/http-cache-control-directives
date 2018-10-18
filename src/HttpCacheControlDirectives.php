@@ -58,6 +58,20 @@ class HttpCacheControlDirectives
         return $this->directives;
     }
 
+    public function getDirective(string $token)
+    {
+        $token = strtolower($token);
+
+        return $this->directives[$token] ?? null;
+    }
+
+    public function hasDirective(string $token): bool
+    {
+        $token = strtolower($token);
+
+        return array_key_exists($token, $this->directives);
+    }
+
     private function parse(string $directivesString): array
     {
         $directives = [];

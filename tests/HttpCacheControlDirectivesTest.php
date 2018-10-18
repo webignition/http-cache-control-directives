@@ -73,4 +73,17 @@ class HttpCacheControlDirectivesTest extends TestCase
             ],
         ];
     }
+
+    public function testGetDirectiveHasDirective()
+    {
+        $directivesString = 'max-age=1, max-stale=2, min-fresh=3 no-cache, public';
+
+        $cacheControlDirectives = new HttpCacheControlDirectives($directivesString);
+
+        $this->assertSame(1, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_AGE));
+        $this->assertSame(2, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_STALE));
+        $this->assertSame(3, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MIN_FRESH));
+        $this->assertFalse($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::S_MAXAGE));
+        $this->assertTrue($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::PUBLIC));
+    }
 }

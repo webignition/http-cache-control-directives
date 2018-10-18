@@ -21,6 +21,14 @@
             "webignition\\HttpCacheControlDirectives\\Tests\\": "tests/"
         }
     },
+    "scripts": {
+        "test": "./vendor/bin/phpunit --colors=always",
+        "cs": "./vendor/bin/phpcs src tests --colors --standard=PSR2",
+        "ci": [
+            "@composer cs",
+            "@composer test"
+        ]
+    },
     "require": {
         "php": ">=7.2"
     },

@@ -72,6 +72,26 @@ class HttpCacheControlDirectives
         return array_key_exists($token, $this->directives);
     }
 
+    public function getMaxAge()
+    {
+        return $this->directives[self::MAX_AGE] ?? null;
+    }
+
+    public function getMaxStale()
+    {
+        return $this->directives[self::MAX_STALE] ?? null;
+    }
+
+    public function getMinFresh()
+    {
+        return $this->directives[self::MIN_FRESH] ?? null;
+    }
+
+    public function getSMaxAge()
+    {
+        return $this->directives[self::S_MAXAGE] ?? null;
+    }
+
     private function parse(string $directivesString): array
     {
         $directives = [];

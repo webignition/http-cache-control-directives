@@ -86,4 +86,48 @@ class HttpCacheControlDirectivesTest extends TestCase
         $this->assertFalse($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::S_MAXAGE));
         $this->assertTrue($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::PUBLIC));
     }
+
+    /**
+     * @dataProvider getIntegerTypeDirectivesByGetterDataProvider
+     *
+     * @param string $directives
+     * @param int|null $expectedMaxAge
+     * @param int|null $expectedMaxStale
+     * @param int|null $expectedMinFresh
+     * @param int|null $expectedSMaxAge
+     */
+    public function testGetIntegerTypeDirectivesByGetter(
+        string $directives,
+        ?int $expectedMaxAge,
+        ?int $expectedMaxStale,
+        ?int $expectedMinFresh,
+        ?int $expectedSMaxAge
+    ) {
+        $cacheControlDirectives = new HttpCacheControlDirectives($directives);
+
+        $this->assertSame($expectedMaxAge, $cacheControlDirectives->getMaxAge());
+        $this->assertSame($expectedMaxStale, $cacheControlDirectives->getMaxStale());
+        $this->assertSame($expectedMinFresh, $cacheControlDirectives->getMinFresh());
+        $this->assertSame($expectedSMaxAge, $cacheControlDirectives->getSMaxAge());
+    }
+
+    public function getIntegerTypeDirectivesByGetterDataProvider(): array
+    {
+        return [
+            'none' => [
+                'directives' => '',
+                'expectedMaxAge' => null,
+                'expectedMaxStale' => null,
+                'expectedMinFresh' => null,
+                'expectedSMaxAge' => null,
+            ],
+            'all' => [
+                'directives' => 'max-age=1, max-stale=2, min-fresh=3, s-maxage=4',
+                'expectedMaxAge' => 1,
+                'expectedMaxStale' => 2,
+                'expectedMinFresh' => 3,
+                'expectedSMaxAge' => 4,
+            ],
+        ];
+    }
 }

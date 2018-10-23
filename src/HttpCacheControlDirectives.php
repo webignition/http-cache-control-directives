@@ -26,6 +26,11 @@ class HttpCacheControlDirectives
         $this->directives = $this->parser->parse($directives);
     }
 
+    public function addDirectives(string $directives = '')
+    {
+        $this->directives = array_merge($this->directives, $this->parser->parse($directives));
+    }
+
     public function getDirectives(): array
     {
         return $this->directives;

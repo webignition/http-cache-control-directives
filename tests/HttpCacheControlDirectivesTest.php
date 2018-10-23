@@ -39,6 +39,78 @@ class HttpCacheControlDirectivesTest extends TestCase
         ];
     }
 
+    /**
+     * @dataProvider addDirectivesDataProvider
+     *
+     * @param string $creationDirectives
+     * @param array $additionalDirectivesCollection
+     * @param array $expectedDirectives
+     */
+    public function testAddDirectives(
+        string $creationDirectives,
+        array $additionalDirectivesCollection,
+        array $expectedDirectives
+    ) {
+        $cacheControlDirectives = new HttpCacheControlDirectives($creationDirectives);
+
+        foreach ($additionalDirectivesCollection as $directiveString) {
+            $cacheControlDirectives->addDirectives($directiveString);
+        }
+
+        $this->assertSame($expectedDirectives, $cacheControlDirectives->getDirectives());
+    }
+
+    public function addDirectivesDataProvider(): array
+    {
+        return [
+            'empty creation, empty additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [],
+                'expectedDirectives' => [],
+            ],
+            'empty creation, single additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [
+                    'no-cache public max-age=1',
+                ],
+                'expectedDirectives' => [
+                    'no-cache' =>  null,
+                    'public' => null,
+                    'max-age' => 1,
+                ],
+            ],
+            'empty creation, multiple additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [
+                    'no-cache public max-age=1',
+                    'must-revalidate',
+                    'max-stale=2',
+                ],
+                'expectedDirectives' => [
+                    'no-cache' =>  null,
+                    'public' => null,
+                    'max-age' => 1,
+                    'must-revalidate' => null,
+                    'max-stale' => 2,
+                ],
+            ],
+            'non-empty creation, multiple additional' => [
+                'creationDirectives' => 'no-cache public max-age=1',
+                'additionalDirectivesCollection' => [
+                    'must-revalidate',
+                    'max-stale=2',
+                ],
+                'expectedDirectives' => [
+                    'no-cache' =>  null,
+                    'public' => null,
+                    'max-age' => 1,
+                    'must-revalidate' => null,
+                    'max-stale' => 2,
+                ],
+            ],
+        ];
+    }
+
     public function testGetDirectiveHasDirective()
     {
         $directivesString = 'max-age=1, max-stale=2, min-fresh=3 no-cache, public';

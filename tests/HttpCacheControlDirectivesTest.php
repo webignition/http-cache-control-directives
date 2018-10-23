@@ -4,6 +4,7 @@ namespace webignition\HttpCacheControlDirectives\Tests;
 
 use PHPUnit\Framework\TestCase;
 use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
+use webignition\HttpCacheControlDirectives\Tokens;
 
 class HttpCacheControlDirectivesTest extends TestCase
 {
@@ -80,11 +81,11 @@ class HttpCacheControlDirectivesTest extends TestCase
 
         $cacheControlDirectives = new HttpCacheControlDirectives($directivesString);
 
-        $this->assertSame(1, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_AGE));
-        $this->assertSame(2, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_STALE));
-        $this->assertSame(3, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MIN_FRESH));
-        $this->assertFalse($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::S_MAXAGE));
-        $this->assertTrue($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::PUBLIC));
+        $this->assertSame(1, $cacheControlDirectives->getDirective(Tokens::MAX_AGE));
+        $this->assertSame(2, $cacheControlDirectives->getDirective(Tokens::MAX_STALE));
+        $this->assertSame(3, $cacheControlDirectives->getDirective(Tokens::MIN_FRESH));
+        $this->assertFalse($cacheControlDirectives->hasDirective(Tokens::S_MAXAGE));
+        $this->assertTrue($cacheControlDirectives->hasDirective(Tokens::PUBLIC));
     }
 
     /**

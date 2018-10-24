@@ -4,6 +4,7 @@ namespace webignition\HttpCacheControlDirectives\Tests;
 
 use PHPUnit\Framework\TestCase;
 use webignition\HttpCacheControlDirectives\HttpCacheControlDirectives;
+use webignition\HttpCacheControlDirectives\Tokens;
 
 class HttpCacheControlDirectivesTest extends TestCase
 {
@@ -13,7 +14,7 @@ class HttpCacheControlDirectivesTest extends TestCase
      * @param string $directives
      * @param array $expectedDirectives
      */
-    public function testCreate(string $directives, array $expectedDirectives)
+    public function testGetDirectives(string $directives, array $expectedDirectives)
     {
         $cacheControlDirectives = new HttpCacheControlDirectives($directives);
 
@@ -27,10 +28,6 @@ class HttpCacheControlDirectivesTest extends TestCase
                 'directives' => '',
                 'expectedDirectives' => [],
             ],
-            'whitespace' => [
-                'directives' => '   ',
-                'expectedDirectives' => [],
-            ],
             'non-empty' => [
                 'directives' => 'foo=bar fizz buzz',
                 'expectedDirectives' => [
@@ -39,36 +36,76 @@ class HttpCacheControlDirectivesTest extends TestCase
                     'foo' => 'bar',
                 ],
             ],
-            'non-empty, multiple whitespace between tokens' => [
-                'directives' => 'foo=bar     fizz     buzz',
-                'expectedDirectives' => [
-                    'buzz' => null,
-                    'fizz' => null,
-                    'foo' => 'bar',
-                ],
+        ];
+    }
+
+    /**
+     * @dataProvider addDirectivesDataProvider
+     *
+     * @param string $creationDirectives
+     * @param array $additionalDirectivesCollection
+     * @param array $expectedDirectives
+     */
+    public function testAddDirectives(
+        string $creationDirectives,
+        array $additionalDirectivesCollection,
+        array $expectedDirectives
+    ) {
+        $cacheControlDirectives = new HttpCacheControlDirectives($creationDirectives);
+
+        foreach ($additionalDirectivesCollection as $directiveString) {
+            $cacheControlDirectives->addDirectives($directiveString);
+        }
+
+        $this->assertSame($expectedDirectives, $cacheControlDirectives->getDirectives());
+    }
+
+    public function addDirectivesDataProvider(): array
+    {
+        return [
+            'empty creation, empty additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [],
+                'expectedDirectives' => [],
             ],
-            'integer types are cast to integer' => [
-                'directives' => 'max-age=1, max-stale=2, min-fresh=3, s-maxage=4',
-                'expectedDirectives' => [
-                    'max-age' => 1,
-                    'max-stale' => 2,
-                    'min-fresh' => 3,
-                    's-maxage' => 4,
+            'empty creation, single additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [
+                    'no-cache public max-age=1',
                 ],
-            ],
-            'types with no value have value removed' => [
-                'directives' =>
-                    'no-cache=a, no-store=a, no-transform=a, only-if-cached=a, must-revalidate=a, public=a, '
-                    .'private=a, proxy-revalidate=a',
                 'expectedDirectives' => [
-                    'no-cache' => null,
-                    'no-store' => null,
-                    'no-transform' => null,
-                    'only-if-cached' => null,
-                    'must-revalidate' => null,
+                    'no-cache' =>  null,
                     'public' => null,
-                    'private' => null,
-                    'proxy-revalidate' => null,
+                    'max-age' => 1,
+                ],
+            ],
+            'empty creation, multiple additional' => [
+                'creationDirectives' => '',
+                'additionalDirectivesCollection' => [
+                    'no-cache public max-age=1',
+                    'must-revalidate',
+                    'max-stale=2',
+                ],
+                'expectedDirectives' => [
+                    'no-cache' =>  null,
+                    'public' => null,
+                    'max-age' => 1,
+                    'must-revalidate' => null,
+                    'max-stale' => 2,
+                ],
+            ],
+            'non-empty creation, multiple additional' => [
+                'creationDirectives' => 'no-cache public max-age=1',
+                'additionalDirectivesCollection' => [
+                    'must-revalidate',
+                    'max-stale=2',
+                ],
+                'expectedDirectives' => [
+                    'no-cache' =>  null,
+                    'public' => null,
+                    'max-age' => 1,
+                    'must-revalidate' => null,
+                    'max-stale' => 2,
                 ],
             ],
         ];
@@ -80,11 +117,11 @@ class HttpCacheControlDirectivesTest extends TestCase
 
         $cacheControlDirectives = new HttpCacheControlDirectives($directivesString);
 
-        $this->assertSame(1, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_AGE));
-        $this->assertSame(2, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MAX_STALE));
-        $this->assertSame(3, $cacheControlDirectives->getDirective(HttpCacheControlDirectives::MIN_FRESH));
-        $this->assertFalse($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::S_MAXAGE));
-        $this->assertTrue($cacheControlDirectives->hasDirective(HttpCacheControlDirectives::PUBLIC));
+        $this->assertSame(1, $cacheControlDirectives->getDirective(Tokens::MAX_AGE));
+        $this->assertSame(2, $cacheControlDirectives->getDirective(Tokens::MAX_STALE));
+        $this->assertSame(3, $cacheControlDirectives->getDirective(Tokens::MIN_FRESH));
+        $this->assertFalse($cacheControlDirectives->hasDirective(Tokens::S_MAXAGE));
+        $this->assertTrue($cacheControlDirectives->hasDirective(Tokens::PUBLIC));
     }
 
     /**
